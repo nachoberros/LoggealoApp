@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Loggealo.CommonModel/bin/Debug/net8.0
+/Loggealo.CommonModel/obj
+/Loggealo.Services/bin/Debug/net8.0
+/Loggealo.Services/obj/Debug/net8.0
+/Loggealo.Services/obj
+/LoggealoApp/bin/Debug/net8.0
+/LoggealoApp/obj/Debug/net8.0
+/LoggealoApp/obj
