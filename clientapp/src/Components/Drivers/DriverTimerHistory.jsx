@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { format, formatDistanceStrict, parseISO } from 'date-fns';
+import * as XLSX from 'xlsx';
 import api from '../../Api/axios';
 import {
     Box,
+    Button,
     Table,
     TableBody,
     TableCell,
@@ -18,6 +20,7 @@ import {
 
 const DriverTimerHistory = () => {
     const [logs, setLogs] = useState([]);
+    const [monthLogs, setMonthLogs] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -41,6 +44,33 @@ const DriverTimerHistory = () => {
 
         fetchLogs();
     }, [page]);
+
+    const exportToExcel = async () => {
+        const res = await api.get('/api/driverlog/month');
+        const data = res.data;
+
+        setMonthLogs(data);
+
+        const rows = data.map(log => {
+            const start = new Date(log.dateStart);
+            const end = new Date(log.dateEnd);
+
+            const durationSeconds = (end - start) / 1000;
+            const durationHours = (durationSeconds / 3600).toFixed(1);
+
+            return {
+                datestart: format(start, 'PPpp'),
+                dateend: format(end, 'PPpp'),
+                duration_hours: parseFloat(durationHours)
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Driver Logs');
+
+        XLSX.writeFile(workbook, 'driver_timer_logs.xlsx');
+    };
 
     return (
         <Box p={4}>
@@ -101,7 +131,25 @@ const DriverTimerHistory = () => {
                     </Box>
                 </>
             )}
+            <Box mt={4} display="flex" justifyContent="flex-end">
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={exportToExcel}
+                    sx={{
+                        padding: '8px 14px',
+                        fontWeight: 600,
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        boxShadow: 2,
+                        marginRight:'15%'
+                    }}
+                >
+                    Export month's logs to Excel
+                </Button>
+            </Box>
         </Box>
+
     );
 };
 

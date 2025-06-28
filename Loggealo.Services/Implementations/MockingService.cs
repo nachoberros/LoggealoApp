@@ -17,7 +17,7 @@ namespace Loggealo.Services.Implementations
             _accounts = [InitializeMockedAccount()];
         }
 
-        public PaginatedResult<DriverTimerLog> GetDriverLogs(int accountId, int userId, int page, int pageSize)
+        public PaginatedResult<DriverTimerLog> GetPaginatedDriverLogs(int accountId, int userId, int page, int pageSize)
         {
             var skip = (page - 1) * pageSize;
             var logs = _accounts.FirstOrDefault(a => a.Id.Equals(accountId))?.DriverLogs
@@ -35,6 +35,13 @@ namespace Loggealo.Services.Implementations
                 Page = page,
                 PageSize = pageSize
             };
+        }
+
+        public List<DriverTimerLog> GetDateRangeLogList(int accountId, int userId, DateTime start, DateTime end)
+        {
+            var logs = _accounts.FirstOrDefault(a => a.Id.Equals(accountId))?.DriverLogs.Where(l => l.DateStart >= start && l.DateEnd < end).OrderByDescending(x => x.DateStart).ToList();
+
+            return logs ?? new List<DriverTimerLog>();
         }
 
         public void AddDriverLog(int accountId, DriverTimerLog log)

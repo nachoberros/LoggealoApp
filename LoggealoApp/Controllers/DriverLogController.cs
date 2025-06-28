@@ -20,11 +20,24 @@ namespace LoggealoApp.Controllers
         }
 
         [HttpGet("list")]
-        public IActionResult GetLogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetPaginatedLogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (AccountId < 1 || UserId < 1) return Unauthorized("Claims not found.");
 
             return Ok(_driverLogService.GetPaginatedDriverLogs(AccountId ?? 0, UserId ?? 0, page, pageSize));
+        }
+
+        [HttpGet("month")]
+        public IActionResult GetMonthlyLogList()
+        {
+            if (AccountId < 1 || UserId < 1) return Unauthorized("Claims not found.");
+
+            DateTime now = DateTime.Now;
+
+            DateTime startDate = new(now.Year, now.Month, 1);
+            DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+            return Ok(_driverLogService.GetDateRangeLogList(AccountId ?? 0, UserId ?? 0, startDate, endDate));
         }
 
         [HttpPost]

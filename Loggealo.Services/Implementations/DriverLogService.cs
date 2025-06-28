@@ -18,7 +18,15 @@ namespace Loggealo.Services.Implementations
             if (accountId < 1 || userId < 1)
                 throw new NullReferenceException("AccountId and UserId cannot be null");
 
-            return _repository.GetDriverLogs(accountId, userId, page, pageSize);
+            return _repository.GetPaginatedDriverLogs(accountId, userId, page, pageSize);
+        }
+
+        public List<DriverTimerLog> GetDateRangeLogList(int accountId, int userId, DateTime start, DateTime end)
+        {
+            if (accountId < 1 || userId < 1)
+                throw new NullReferenceException("AccountId and UserId cannot be null");
+
+            return _repository.GetDateRangeLogList(accountId, userId, start, end);
         }
 
         public void AddDriverLog(int accountId, DriverTimerLog log)
