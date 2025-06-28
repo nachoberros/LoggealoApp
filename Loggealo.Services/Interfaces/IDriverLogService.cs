@@ -1,10 +1,12 @@
-﻿using Loggealo.CommonModel.TimerLogs;
+﻿using Loggealo.CommonModel;
+using Loggealo.CommonModel.TimerLogs;
 
 namespace Loggealo.Services.Interfaces
 {
     public interface IDriverLogService
     {
-        List<DriverTimerLog> GetDriverLogs(int accountId, int userId);
+        PaginatedResult<DriverTimerLog> GetPaginatedDriverLogs(int accountId, int userId, int page, int pageSize);
+        List<DriverTimerLog> GetDateRangeLogList(int accountId, int userId, DateTime start, DateTime end);
         void AddDriverLog(int accountId, DriverTimerLog log);
     }
 }

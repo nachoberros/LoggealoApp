@@ -12,6 +12,7 @@ const Login = () => {
       const res = await api.post('api/auth/login', { email, password });
       const data = res.data;
       localStorage.setItem('token', data.token);
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
 
       window.location.href = '/driverlog';
     } catch (err) {
@@ -21,7 +22,7 @@ const Login = () => {
 
   return (
     <form className="login-container" onSubmit={handleLogin}>
-      <h2>Login</h2>
+      <h2>Loggealo</h2>
       <input
         type="text"
         placeholder="Email"
