@@ -4,44 +4,57 @@ import api from '../../Api/axios';
 const DriverTimer = () => {
   const [seconds, setSeconds] = useState(0);
   const [running, setRunning] = useState(false);
-  const [startTime, setStartTime] = useState(null);
   const intervalRef = useRef(null);
 
+  // Load state from localStorage
+  useEffect(() => {
+    const storedStart = localStorage.getItem('driverTimerStart');
+    if (storedStart) {
+      const start = new Date(storedStart);
+      const elapsed = Math.floor((Date.now() - start.getTime()) / 1000);
+      setSeconds(elapsed);
+      setRunning(true);
+    }
+  }, []);
+
+  // Timer effect
   useEffect(() => {
     if (running) {
-      const now = new Date();
-      setStartTime(now);
       intervalRef.current = setInterval(() => {
         setSeconds(prev => prev + 1);
       }, 1000);
-    }
-    else {
+    } else {
       clearInterval(intervalRef.current);
     }
 
     return () => clearInterval(intervalRef.current);
   }, [running]);
 
-  const handleStart = () => setRunning(true);
+  const handleStart = () => {
+    const now = new Date();
+    localStorage.setItem('driverTimerStart', now.toISOString());
+    setSeconds(0);
+    setRunning(true);
+  };
+
   const handlePause = async () => {
+    const startTime = new Date(localStorage.getItem('driverTimerStart'));
     const endTime = new Date();
-    const payload = {
-      
-    };
 
     try {
       await api.post('api/driverlog', {
-        datestart: startTime?.toISOString(),
+        datestart: startTime.toISOString(),
         dateend: endTime.toISOString()
       });
 
-      console.log('Timer data sent:', payload);
+      console.log('Timer data sent');
     } catch (error) {
       console.error('Error sending timer data:', error);
     }
 
-    setRunning(false)
-
+    localStorage.removeItem('driverTimerStart');
+    setRunning(false);
+    setSeconds(0);
   };
 
   return (

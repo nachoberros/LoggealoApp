@@ -1,4 +1,5 @@
-﻿using Loggealo.CommonModel.Account;
+﻿using Loggealo.CommonModel;
+using Loggealo.CommonModel.Account;
 using Loggealo.CommonModel.TimerLogs;
 using Loggealo.CommonModel.Users;
 using Loggealo.CommonModel.Users.Enum;
@@ -16,15 +17,24 @@ namespace Loggealo.Services.Implementations
             _accounts = [InitializeMockedAccount()];
         }
 
-        public List<DriverTimerLog> GetDriverLogs(int accountId, int userId)
+        public PaginatedResult<DriverTimerLog> GetDriverLogs(int accountId, int userId, int page, int pageSize)
         {
-            var logs = _accounts.FirstOrDefault(a => a.Id.Equals(accountId))?.DriverLogs;
-            if (logs == null)
-            {
-                return [];
-            }
+            var skip = (page - 1) * pageSize;
+            var logs = _accounts.FirstOrDefault(a => a.Id.Equals(accountId))?.DriverLogs
+                .OrderByDescending(x => x.DateStart)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
 
-            return [.. logs.Where(l => l.UserId == userId).OrderByDescending(l => l.DateStart)];
+            var totalCount = _accounts.FirstOrDefault(a => a.Id.Equals(accountId))?.DriverLogs.Count;
+
+            return new PaginatedResult<DriverTimerLog>
+            {
+                Items = logs ?? [],
+                TotalCount = totalCount ?? 0,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public void AddDriverLog(int accountId, DriverTimerLog log)

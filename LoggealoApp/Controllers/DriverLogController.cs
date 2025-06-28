@@ -19,12 +19,12 @@ namespace LoggealoApp.Controllers
             _logger = logger;
         }
 
-        [HttpGet("/list")]
-        public IActionResult GetLogs()
+        [HttpGet("list")]
+        public IActionResult GetLogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (AccountId < 1 || UserId < 1) return Unauthorized("Claims not found.");
 
-            return Ok(_driverLogService.GetDriverLogs(AccountId ?? 0, UserId ?? 0));
+            return Ok(_driverLogService.GetPaginatedDriverLogs(AccountId ?? 0, UserId ?? 0, page, pageSize));
         }
 
         [HttpPost]

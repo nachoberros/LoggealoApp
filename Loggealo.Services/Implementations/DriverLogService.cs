@@ -1,4 +1,5 @@
-﻿using Loggealo.CommonModel.TimerLogs;
+﻿using Loggealo.CommonModel;
+using Loggealo.CommonModel.TimerLogs;
 using Loggealo.Services.Interfaces;
 
 namespace Loggealo.Services.Implementations
@@ -12,12 +13,12 @@ namespace Loggealo.Services.Implementations
             _repository = repository;
         }
 
-        public List<DriverTimerLog> GetDriverLogs(int accountId, int userId)
+        public PaginatedResult<DriverTimerLog> GetPaginatedDriverLogs(int accountId, int userId, int page, int pageSize)
         {
             if (accountId < 1 || userId < 1)
                 throw new NullReferenceException("AccountId and UserId cannot be null");
 
-            return _repository.GetDriverLogs(accountId, userId);
+            return _repository.GetDriverLogs(accountId, userId, page, pageSize);
         }
 
         public void AddDriverLog(int accountId, DriverTimerLog log)

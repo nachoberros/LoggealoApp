@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { format, formatDistanceStrict, parseISO } from 'date-fns';
 import api from '../../Api/axios';
 import {
     Box,
@@ -27,8 +28,8 @@ const DriverTimerHistory = () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await api.get(`/api/timerlogs?page=${page}&pageSize=10`);
-                setLogs(res.data.data);
+                const res = await api.get(`/api/driverlog/list?page=${page}&pageSize=10`);
+                setLogs(res.data.items);
                 setTotalPages(res.data.totalPages);
             } catch (err) {
                 console.error('Failed to load logs:', err);
@@ -68,12 +69,23 @@ const DriverTimerHistory = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {logs.map((log, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{new Date(log.dateStart).toLocaleString()}</TableCell>
-                                        <TableCell>{new Date(log.dateEnd).toLocaleString()}</TableCell>
-                                    </TableRow>
-                                ))}
+                                {logs.map((log, index) => {
+                                    const start = parseISO(log.dateStart);
+                                    const end = parseISO(log.dateEnd);
+
+                                    const formattedStart = format(start, "eee, MMM d · h:mm a");
+                                    const formattedEnd = format(end, "h:mm a");
+                                    const duration = formatDistanceStrict(start, end);
+
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>{formattedStart}</TableCell>
+                                            <TableCell>
+                                                {formattedEnd} <Typography variant="body2" component="span" color="textSecondary">({duration})</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -84,6 +96,7 @@ const DriverTimerHistory = () => {
                             page={page}
                             onChange={(e, value) => setPage(value)}
                             color="primary"
+                            disabled={totalPages <= 1}
                         />
                     </Box>
                 </>
